@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Control Interno - La Casita de Tom</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/estilos.css') }}">
+</head>
+<body>
+
+  <nav class="navbar navbar-dark navbar-custom py-3">
+    <div class="container">
+      <span class="navbar-brand navbar-brand-custom">⚙️ Panel <span>Administrativo</span></span>
+      <a href="{{ url_for('logout') }}" class="btn btn-outline-danger"><i class="fa-solid fa-power-off"></i> Salir</a>
+    </div>
+  </nav>
+
+  <div class="container mt-4 mb-5">
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} text-dark fw-bold">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <div class="row">
+      <div class="col-lg-6 mb-4">
+        <div class="p-4 bg-dark border border-secondary rounded">
+          <h3 class="text-white mb-3"><i class="fa-solid fa-box text-success"></i> Crear Producto</h3>
+          <form action="{{ url_for('crear_producto') }}" method="POST">
+            <input type="text" class="form-control mb-2 bg-secondary text-white placeholder-light" name="nombre" placeholder="Nombre del Producto" required>
+            <input type="number" step="0.01" class="form-control mb-2 bg-secondary text-white" name="precio" placeholder="Precio (S/)" required>
+            <input type="text" class="form-control mb-2 bg-secondary text-white" name="imagen" placeholder="URL de la imagen (Opcional)">
+            <input type="text" class="form-control mb-2 bg-secondary text-white" name="categoria" placeholder="Categoría (ej: cuadernos, utiles)" required>
+            <div class="form-check mb-3">
+              <input type="checkbox" class="form-check-input" name="destacado" id="dest" checked>
+              <label class="form-check-label text-light" for="dest">Mostrar en Inicio (Destacado)</label>
+            </div>
+            <button class="btn btn-success w-100" type="submit">Añadir al Inventario</button>
+          </form>
+
+          <h5 class="text-white mt-4">Lista Actual ({{ productos|length }})</h5>
+          <div style="max-height: 200px; overflow-y: auto;" class="border border-secondary p-2 rounded">
+            {% for prod in productos %}
+              <div class="d-flex justify-content-between align-items-center text-muted border-bottom border-secondary py-1">
+                <span>{{ prod.nombre }} - S/{{ prod.precio }}</span>
+                <a href="{{ url_for('eliminar_producto', id=prod.id) }}" class="text-danger"><i class="fa-solid fa-trash"></i></a>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6 mb-4">
+        <div class="p-4 bg-dark border border-secondary rounded">
+          <h3 class="text-white mb-3"><i class="fa-solid fa-bell-concierge text-success"></i> Nuevo Servicio</h3>
+          <form action="{{ url_for('crear_servicio') }}" method="POST">
+            <input type="text" class="form-control mb-2 bg-secondary text-white" name="nombre" placeholder="Nombre del Servicio" required>
+            <input type="number" step="0.01" class="form-control mb-2 bg-secondary text-white" name="precio" placeholder="Precio del Servicio" required>
+            <textarea class="form-control mb-3 bg-secondary text-white" name="descripcion" placeholder="Descripción Breve" rows="2" required></textarea>
+            <button class="btn btn-success w-100" type="submit">Registrar Servicio</button>
+          </form>
+
+          <h5 class="text-white mt-4">Servicios Activos</h5>
+          <div style="max-height: 200px; overflow-y: auto;" class="border border-secondary p-2 rounded">
+            {% for serv in servicios %}
+              <div class="d-flex justify-content-between align-items-center text-muted border-bottom border-secondary py-1">
+                <span>{{ serv.nombre }} (S/{{ serv.precio }})</span>
+                <a href="{{ url_for('eliminar_servicio', id=serv.id) }}" class="text-danger"><i class="fa-solid fa-trash"></i></a>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+
+      <div class="col-112">
+        <div class="p-4 bg-dark border border-secondary rounded">
+          <h3 class="text-white mb-3"><i class="fa-solid fa-users text-success"></i> Gestión de Clientes Registrados en usuarios.txt</h3>
+          <table class="table table-dark table-striped mb-0">
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Contraseña Guardada</th>
+                <th class="text-center">Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for user in usuarios %}
+                <tr>
+                  <td>{{ user.usuario }}</td>
+                  <td><code>{{ user.contrasena }}</code></td>
+                  <td class="text-center">
+                    <a href="{{ url_for('eliminar_cliente', username=user.usuario) }}" class="btn btn-sm btn-danger"><i class="fa-solid fa-user-minus"></i> Eliminar</a>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>
